@@ -62,4 +62,11 @@ class myDbClass {
         $prefix_dbname = $this->dbname;
         return $client->$prefix_dbname->$name_collection;
     }
+
+    public function insertOne($collectionName, $document) {
+        $client = $this->getClient();
+        $collection = $client->selectCollection($this->dbname, $collectionName);
+        $result = $collection->insertOne($document);
+        return $result->getInsertedId();
+    }
 }

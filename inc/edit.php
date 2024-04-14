@@ -41,13 +41,34 @@ if ($id == '') {
     $confirm = GETPOST('confirm_envoyer');
     if ($confirm == 'Envoyer') {
 
-        /**
-         *  A implémenter : 
-         * Récupérer les données transmises par le formulaire
-         * Les envoyer pour mettre à jour l'enregistrement correspondant dans votre base MongoDB
-         * Si c'est OK : On retourne à la liste,
-         * Si il y a eu une erreur, On reste sur la page d'édition
-         * */
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            $title = $_POST['title'];
+            $year = $_POST['year'];
+            $realisateurs = $_POST['realisateurs'];
+            $producteurs = $_POST['producteurs'];
+            $acteurs_principaux = $_POST['acteurs_principaux'];
+            $synopsis = $_POST['synopsis'];
+        
+            $data = [
+                'title' => $title,
+                'year' => $year,
+                'realisateurs' => $realisateurs,
+                'producteurs' => $producteurs,
+                'acteurs_principaux' => $acteurs_principaux,
+                'synopsis' => $synopsis
+            ];
+        
+            $myDb = new myDbClass();
+        
+            $result = $myDb->updateOne('myCollection', ['title' => $title], ['$set' => $data]);
+        
+            if ($result->getModifiedCount() > 0) {
+                header("Location: list.php");
+                exit();
+            } else {
+                echo "Erreur lors de la mise à jour.";
+            }
+        }
 
         exit(0);
     }

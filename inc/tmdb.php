@@ -128,13 +128,33 @@ $cols = array(
 
             if ($import == 'confirm') {
                 if ($current_res['id'] != $document['id_tmdb'] || $forceUpdate) {
-                    /**
-                     *  A implémenter : 
-                     * Récupérer les données transmises par le formulaire
-                     * Les envoyer pour mettre à jour l'enregistrement correspondant dans votre base MongoDB
-                     * Si nous sommes sur un enregistrement déjà existant alors on fait une mise à jour,
-                     * Sinon, c'est un nouvel enregistrement, alors on fait une création
-                     * */
+                    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                        $title = $_POST['title'];
+                        $year = $_POST['year'];
+                        $realisateurs = $_POST['realisateurs'];
+                        $producteurs = $_POST['producteurs'];
+                        $acteurs_principaux = $_POST['acteurs_principaux'];
+                        $synopsis = $_POST['synopsis'];
+                    
+                        $data = [
+                            'title' => $title,
+                            'year' => $year,
+                            'realisateurs' => $realisateurs,
+                            'producteurs' => $producteurs,
+                            'acteurs_principaux' => $acteurs_principaux,
+                            'synopsis' => $synopsis
+                        ];
+                    
+                        $myDb = new myDbClass();
+                    
+                        $existingRecord = $myDb->findOne('myCollection', ['title' => $title]);
+                    
+                        if ($existingRecord) {
+                            $myDb->updateOne('myCollection', ['title' => $title], ['$set' => $data]);
+                        } else {
+                            $myDb->insertOne('myCollection', $data);
+                        }
+                    }
                 }
             }
             print_tr_movie($document, $cols);

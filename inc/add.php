@@ -10,15 +10,54 @@ $movies_collection = $mdb->getCollection('movies');
 $confirm = GETPOST('confirm_envoyer');
 if ($confirm == 'Envoyer') {
 
-    /**
-     *  A implémenter : 
-     * Récupérer les données transmieses par le formulaire
-     * Les envoyer en tant que nouvel enregistrement dans votre base MongoDB
-     * Si c'est OK : On retourne à la liste,
-     * Si il y a eu une erreur, On reste sur la page d'ajout
-     * */
+    use JsonSchema\Validator;
+    use JsonSchema\Constraints\Constraint;
 
-    exit(0);
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $title = $_POST['title'];
+    $year = $_POST['year'];
+    $realisateurs = $_POST['realisateurs'];
+    $producteurs = $_POST['producteurs'];
+    $acteurs_principaux = $_POST['acteurs_principaux'];
+    $synopsis = $_POST['synopsis'];
+
+    $data = [
+        "title" => $title,
+        "year" => $year,
+        "realisateurs" => $realisateurs,
+        "producteurs" => $producteurs,
+        "acteurs_principaux" => $acteurs_principaux,
+        "synopsis" => $synopsis
+    ];
+
+    $schema = (object)[
+        "type" => "object",
+        "properties" => (object)[
+            "title" => (object)["type" => "string"],
+            "year" => (object)["type" => "string"],
+            "realisateurs" => (object)["type" => "string"],
+            "producteurs" => (object)["type" => "string"],
+            "acteurs_principaux" => (object)["type" => "string"],
+            "synopsis" => (object)["type" => "string"]
+        ],
+        "required" => ["title", "year", "realisateurs", "producteurs", "acteurs_principaux", "synopsis"]
+    ];
+
+    $validator = new Validator;
+    $validator->validate($data, $schema, Constraint::CHECK_MODE_APPLY_DEFAULTS);
+
+    if ($validator->isValid()) {
+        $myDb = new myDbClass();
+        $insertedId = $myDb->insertOne('myCollection', $data);
+        header("Location: index.php");
+        exit();
+    } else {
+        echo "JSON does not validate. Violations:\n";
+        foreach ($validator->getErrors() as $error) {
+            echo sprintf("[%s] %s\n", $error['property'], $error['message']);
+        }
+    }
+}
 }
 ?>
 <div class="dtitle w3-container w3-teal">

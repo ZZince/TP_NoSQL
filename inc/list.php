@@ -8,12 +8,26 @@ $params = '';
 $arr_search = array();
 
 
-    /**
-     *  A implémenter : 
-     * Récupérer les données reçues par le formulaire et
-     * Construire le tableau de filtre qui sera utilisé dans la recherche 
-     * envoyé à votre base MongoDB
-     * */
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $title = $_POST['title'];
+    $year = $_POST['year'];
+    $realisateurs = $_POST['realisateurs'];
+    $producteurs = $_POST['producteurs'];
+    $acteurs_principaux = $_POST['acteurs_principaux'];
+    $synopsis = $_POST['synopsis'];
+
+    $filter = [
+        'title' => $title,
+        'year' => $year,
+        'realisateurs' => $realisateurs,
+        'producteurs' => $producteurs,
+        'acteurs_principaux' => $acteurs_principaux,
+        'synopsis' => $synopsis
+    ];
+
+    $myDb = new myDbClass();
+    $results = $myDb->search('myCollection', $filter);
+}
 
 $mdb = new myDbClass();
 
